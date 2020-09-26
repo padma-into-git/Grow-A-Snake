@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Snake Games</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  	<script src="bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+  	<script src="bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+</head>
+<body>
+	<div id="content"></div>
+	<div align="center" style="Margin:50px;">
+		<canvas id="myCanvas"  style="background:black;" height="500" width="800">
+		</canvas>
+	</div>
+
+	<script>
+
+		var c=document.getElementById("myCanvas");
+			var ctx=c.getContext("2d");
+			var dir,score,balls,food,time;
+			function init()
+			{
+				score=0;
+				time=222;
+				dir="right";
+				balls=[
+							{x:40, y:40},
+							{x:60, y:40},
+							{x:80, y:40}
+
+					  ];
+				createFood();
+
+			}
+			init();
+			function createFood()
+			{
+				food={x: Math.floor(Math.random()*39), y: Math.floor(Math.random()*24)};
+				for(var i=0;i<balls.length ;i++)
+				{
+					var ball=balls[i];
+					if(ball.x==food.x && ball.y==food.y)
+						createFood();
+				}
+
+			}
+
+			document.addEventListener("keydown",function (e){
+				var code=e.keyCode;
+				if(code==37 && dir!='right')
+					dir='left';
+				if(code==38 && dir!='down')
+					dir='up';
+				if(code==39 && dir!='left')
+					dir='right';
+				if(code==40 && dir!='up')
+					dir='down';
+
+
+			});
+
+			function add()
+			{
+				var lastBall=balls[balls.length-1];
+				if(dir == 'right')
+					balls.push({x:lastBall.x+20 , y: lastBall.y});
+				if(dir == 'left')
+					balls.push({x:lastBall.x-20 , y: lastBall.y});
+				if(dir == 'down')
+					balls.push({x:lastBall.x , y: lastBall.y+20});
+				if(dir == 'up')
+					balls.push({x:lastBall.x , y: lastBall.y-20});
+
+			}
+			function ani()
+			{	
+
+				ctx.clearRect(0,0,800,500);
+				balls.shift();
+				add();
+				var value=1;
+				var lastBall=balls[balls.length-1];
+				if(food.x*20==lastBall.x && food.y*20==lastBall.y)
+				{
+					add();
+					score+=value;
+					if(score>160)
+						value=value+6;
+					createFood();
+				}
+
+				for(var i=0;i<balls.length;i++)
+				{
+					var ball=balls[i];
+					if(i==balls.length-1)
+					{
+						ctx.fillStyle="lightgreen";
+						if(score>20 && score<50)
+						{
+							ctx.fillStyle="#f441eb";
+							value=value+1;
+						}
+						if(score>60)
+						{
+							ctx.fillStyle="#ff0000";
+							value=value+value;
+						}
+					}
+					else
+						ctx.fillStyle="#e8f442";
+					if(ball.x>780)
+						ball.x=0;
+					if(ball.x<0)
+						ball.x=780;
+					if(ball.y>480)
+						ball.y=0;
+					if(ball.y<0)
+						ball.y=480;
+					ctx.fillRect(ball.x,ball.y,19,19);
+					if(ball.x==lastBall.x && ball.y==lastBall.y && i<balls.length-3)
+					{
+						alert("You are finished, Your Score is : "+score);
+						init();
+					}
+				}
+				ctx.fillRect(food.x*20,food.y*20,19,19);
+				ctx.fillText("Score : "+score,400,480);
+				if(score>check)
+				{
+					check=score+10;
+					if(time>90)
+						time=time-30;
+					if(time<90)
+						time=time-2;
+					clearInterval(gSpeed);
+					gSpeed=setInterval(ani,time);
+				}
+
+
+			}
+
+
+			var gSpeed=setInterval(ani,time);
+			var check=10;
+	</script>
+</body>
+</html>
